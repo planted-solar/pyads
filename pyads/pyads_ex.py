@@ -1099,6 +1099,13 @@ def adsSumWrite(
             buf[offset: offset + len(value)] = value.encode("utf-8")
         elif data_symbols[data_name].dataType == ADST_WSTRING:
             buf[offset: offset + 2 * len(value)] = value.encode("utf-16-le")
+        elif data_symbols[data_name].size > ctypes.sizeof(ads_type_to_ctype[data_symbols[data_name].dataType]):
+            struct.pack_into(
+                "<" + DATATYPE_MAP[ads_type_to_ctype[data_symbols[data_name].dataType]][-1] * (data_symbols[data_name].size // ctypes.sizeof(ads_type_to_ctype[data_symbols[data_name].dataType])),
+                buf,
+                offset,
+                *value,
+            )
         else:
             struct.pack_into(
                 DATATYPE_MAP[ads_type_to_ctype[data_symbols[data_name].dataType]],
