@@ -918,7 +918,6 @@ def adsGetSymbolInfo(port: int, address: AmsAddr, data_name: str) -> SAdsSymbolE
         data_name,
         PLCTYPE_STRING,
     )
-
     return symbol_info
 
 
@@ -945,7 +944,6 @@ def adsSumReadBytes(
         sum_req_array[i].iGroup = idx_group
         sum_req_array[i].iOffset = idx_offset
         sum_req_array[i].size = size
-
     return adsSyncReadWriteReqEx2(
         port,
         address,
@@ -1009,12 +1007,21 @@ def adsSumRead(
                 if null_idx is None:
                     raise ValueError("No null-terminator found in buffer")
                 value = bytearray(sum_response[offset: offset + null_idx]).decode("utf-16-le")
+            elif data_symbols[data_name].size > ctypes.sizeof(ads_type_to_ctype[data_symbols[data_name].dataType]):
+                value = struct.unpack_from(
+                    "<" + DATATYPE_MAP[ads_type_to_ctype[data_symbols[data_name].dataType]][-1] * (data_symbols[data_name].size // ctypes.sizeof(ads_type_to_ctype[data_symbols[data_name].dataType])),
+                    sum_response,
+                    offset=offset,
+                )
             else:
                 value = struct.unpack_from(
                     DATATYPE_MAP[ads_type_to_ctype[data_symbols[data_name].dataType]],
                     sum_response,
                     offset=offset,
                 )[0]
+
+                
+
 
             result[data_name] = value
         offset += data_symbols[data_name].size
