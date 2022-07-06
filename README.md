@@ -18,6 +18,14 @@ Documentation: http://pyads.readthedocs.io/en/latest/index.html
 
 # Installation
 
+git clone this repo
+go to directory. 
+``` pip install -e .```
+find the ads_lib directory
+```make```
+take ads_lib.so and put it in the py_ads folder
+
+
 From PyPi:
 
 ```bash
